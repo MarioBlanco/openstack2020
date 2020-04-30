@@ -15,18 +15,30 @@ const App = () => {
             })
     }, [])
 
-    useEffect(()=>{
-        setFiltered(countries.filter(c=>c.name.toUpperCase().includes(newFilter.toUpperCase())))
-        },[newFilter])
+    useEffect(() => {
+        setFiltered(countries.filter(c => c.name.toUpperCase().includes(newFilter.toUpperCase())))
+    }, [newFilter])
     const handleFilterChange = (event) => {
         setNewFilter(event.target.value)
+    }
+    const handleClickShow = (event) => {
+        event.preventDefault()
+        if (event.target.value)
+            setNewFilter(event.target.value)
+
+
     }
 
     const Country = ({country}) => {
         return (
+
             <li>
-                {country.name}
+                <form>
+                    {country.name}
+                    <button type="submit" onClick={handleClickShow} value={country.name}>show</button>
+                </form>
             </li>
+
         )
     }
 
@@ -64,21 +76,28 @@ const App = () => {
                 </div>
             )
         }
-        if (filtered.length <10) {
+        if (filtered.length < 10) {
             return (
                 <div>
+
                     <ul>
                         {countries.map(
-                            country =>
-                                <Country key={country.name} country={country}/>
+                            country => {
+                                return (
+                                    <div key={country.name}>
+                                        <Country country={country}/>
+                                    </div>
+                                )
+                            }
                         )}
                     </ul>
+
                 </div>
             )
         }
         return (
             <div>
-               Too many matches, specify another filter
+                Too many matches, specify another filter
             </div>
         )
     }
