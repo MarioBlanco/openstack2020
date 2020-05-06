@@ -1,13 +1,16 @@
 import React from 'react'
-const Person = ({person})=>{
+
+const Person = ({person,handleClick})=>{
     return(
         <li>
-            {person.name} - {person.number}
+            <form>
+                {person.name} - {person.number} <button value={person.name} onClick={handleClick} >Delete</button>
+            </form>
         </li>
     )
 
 }
-const Persons = ({persons})=>{
+const Persons = ({persons,handleClickDelete})=>{
 
     return(
         <div>
@@ -15,7 +18,7 @@ const Persons = ({persons})=>{
             <ul>
                 {persons.map(
                     person=>
-                        <Person key={person.name} person={person}/>
+                        <Person key={person.name} person={person} handleClick={handleClickDelete}/>
                 )}
             </ul>
         </div>
