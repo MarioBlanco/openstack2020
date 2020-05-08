@@ -19,10 +19,13 @@ const update = (name, newObject) => {
                     .then(all=>{
                         return all.data.find(p=>p.name===name)
                     })
-                    .then(filtered=>filtered.id)
+                    .then(filtered=>filtered!==null?filtered.id:axios.Cancel("id not found"))
                     .then(theId=>axios.put(`${baseUrl}/${theId}`,newObject))
+
     //const request = axios.put(`${baseUrl}/${id}`, newObject)
-    return request.then(response => response.data)
+    return request.then(response => response.data).catch(error => {
+        console.log('fail')
+    })
 }
 
 const toDelete = (name)=>{

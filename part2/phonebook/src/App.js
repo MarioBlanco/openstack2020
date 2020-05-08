@@ -3,6 +3,8 @@ import Persons from "./Components/Persons";
 import PersonForm from "./Components/PersonForm";
 import Filter from "./Components/Filter";
 import personsService from "./Services/persons";
+import Notification from "./Components/Notification";
+import './App.css'
 const App = () => {
     const [ persons, setPersons ] = useState([
        /* { name: 'Arto Hellas', number: '040-1234567' },
@@ -10,6 +12,11 @@ const App = () => {
         { name: 'Dan Abromov', number: '12-43-234345' },
         { name: 'Mary Poppendieck', number: '39-23-6423122' }*/
     ])
+    const [ newName, setNewName ] = useState('')
+    const [ newNumber, setNewNumber ] = useState('')
+    const [ newFilter, setNewFilter ] = useState('')
+    const [filteredPersons, setFiltered] =useState(persons)
+    const [notificationMessage,setNotificationMessage]=useState([null,'error'])
 
     const updatePersons= (persons)=>{
         setPersons(persons)
@@ -28,10 +35,7 @@ const App = () => {
             getPersons()
         },[])
 
-    const [ newName, setNewName ] = useState('')
-    const [ newNumber, setNewNumber ] = useState('')
-    const [ newFilter, setNewFilter ] = useState('')
-    const [filteredPersons, setFiltered] =useState(persons)
+
     const addPerson = (event)=>{
 
         event.preventDefault()
@@ -45,6 +49,21 @@ const App = () => {
             if(window.confirm(`${personObj.name} already exists in the phonebook, replace the old number with the new one?`)){
                 personsService.update(personObj.name,personObj)
                     .then(()=>getPersons())
+                    .then(()=>{
+                        setNotificationMessage(["Phonebook updated","message"])
+                        setTimeout(()=>{
+                            let newNotify = [null,null]
+                            setNotificationMessage(newNotify)
+                        },3000)
+                    })
+                    .catch(error =>{
+                        console.log(`update failed ${error}`)
+                        setNotificationMessage(["Update failed, person not found on Server","error"])
+                        setTimeout(()=>{
+                            let newNotify = [null,null]
+                            setNotificationMessage(newNotify)
+                        },3000)
+                    })
             }
 
         }else {
@@ -56,12 +75,20 @@ const App = () => {
                     setFiltered(newPersons.filter(p => p.name.toUpperCase().includes(newFilter.toUpperCase())))
                     setNewName('')
                     setNewNumber('')
+                    setNotificationMessage([`${returnedPerson.name} added to the Phonebook`,"message"])
+                    setTimeout(()=>{
+                        let newNotify = [null,null]
+                        setNotificationMessage(newNotify)
+                    },3000)
 
                 })
                 .catch(error => {
-                    alert(
-                        `The person ${personObj.name} already exists in the phonebook's server`
-                    )
+
+                    setNotificationMessage([`The person ${personObj.name} already exists in the phonebook's server`,"error"])
+                    setTimeout(()=>{
+                        let newNotify = [null,null]
+                        setNotificationMessage(newNotify)
+                    },3000)
                     setPersons(persons.filter(p => p.name !== personObj.name))
                 })
         }
@@ -87,15 +114,30 @@ const App = () => {
             //console.log(`handleClickDelete event: ${event.target.value}`)
             personsService
                 .toDelete(event.target.value)
-                .then(() => getPersons())
-                .catch(error => console.log(`delete failed ${error}`))
+                .then(() => {
+                    getPersons()
+                    setNotificationMessage(["Entry deleted","error"])
+                    setTimeout(()=>{
+                        let newNotify = [null,null]
+                        setNotificationMessage(newNotify)
+                    },3000)
+                })
+                .catch(error =>{
+                    console.log(`delete failed ${error}`)
+                    setNotificationMessage(["Delete failed","error"])
+                    setTimeout(()=>{
+                        let newNotify = [null,null]
+                        setNotificationMessage(newNotify)
+                    },3000)
+                })
+
         }
     }
 
     return (
         <div>
             <h2>Phonebook</h2>
-
+            <Notification message={notificationMessage[0]} type={notificationMessage[1]} />
             <Filter
                 newFilter={newFilter}
                 handleFilterChange={handleFilterChange}
